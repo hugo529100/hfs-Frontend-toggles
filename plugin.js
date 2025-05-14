@@ -1,6 +1,6 @@
 exports.version = 1
 exports.apiRequired = 8.65
-exports.description = "Frontend UI toggle plugin"
+exports.description = "Frontend UI toggle plugin, Some relatively minor tweaks—perhaps not useful to others, but at least meaningful to me."
 exports.repo = "Hug3O/Frontend-ui-toggles"
 exports.frontend_js = "main.js"
 
