@@ -49,15 +49,50 @@
   }
 
   if (config.enableFullscreenBtn) {
+    let isFullscreen = false
+    let fullscreenChangeHandler = null
+
     const toggleFullscreen = () => {
       const el = document.documentElement
-      if (!document.fullscreenElement) {
-        el.requestFullscreen?.().catch(err => HFS.toast("Enter fullscreen failed: " + err, 'error'))
+      
+      if (!isFullscreen) {
+        // 进入全屏
+        el.requestFullscreen?.()
+          .then(() => {
+            isFullscreen = true
+            
+            // 添加防止手势返回的监听
+            if (fullscreenChangeHandler) {
+              document.removeEventListener('fullscreenchange', fullscreenChangeHandler)
+            }
+            
+            fullscreenChangeHandler = () => {
+              if (!document.fullscreenElement) {
+                // 如果检测到退出全屏，立即重新进入全屏
+                el.requestFullscreen?.().catch(() => {
+                  isFullscreen = false
+                })
+              }
+            }
+            
+            document.addEventListener('fullscreenchange', fullscreenChangeHandler)
+          })
+          .catch(err => {
+            HFS.toast("Enter fullscreen failed: " + err, 'error')
+          })
       } else {
+        // 退出全屏
+        if (fullscreenChangeHandler) {
+          document.removeEventListener('fullscreenchange', fullscreenChangeHandler)
+          fullscreenChangeHandler = null
+        }
+        
         document.exitFullscreen?.()
+        isFullscreen = false
       }
     }
 
+    // 添加全屏按钮到菜单栏
     HFS.onEvent('appendMenuBar', () => {
       return h(HFS.Btn, {
         icon: '⛶',
@@ -66,6 +101,7 @@
       })
     })
 
+    // 添加全屏按钮到预览控制栏
     setInterval(() => {
       const controls = document.querySelector('.file-show .bar .controls')
       const closeBtn = controls?.querySelector('button[title="Close"]')
