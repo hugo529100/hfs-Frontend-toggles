@@ -31,6 +31,9 @@
   cursor: pointer;
   color: var(--text) !important;
   margin-left: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 /* 菜单栏全屏按钮样式 */
@@ -40,6 +43,9 @@
   cursor: pointer;
   color: var(--text) !important;
   margin-left: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 /* 预览控制栏全屏按钮样式 */
@@ -47,22 +53,29 @@
   padding: 1px 8px;
   font-size: 12px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 /* 按钮标签文字样式（共用） */
 .btn-label {
   display: inline;
-  margin-left: .4em;
+  margin-left: .3em;
 }
 
 /* 手机竖屏（宽度小于等于768px）时隐藏按钮文字，只显示图标 */
-@media (max-width: 768px) {
+@media (max-width: 672px) {
   .menu-bar-refresh-btn .btn-label,
   .menu-bar-fullscreen-btn .btn-label,
-  #refreshButton .btn-label,
-  #refreshListButton .btn-label,
   .preview-controls-fullscreen-btn .btn-label {
     display: none;
+  }
+  
+  /* 确保 #refreshButton 和 #refreshListButton 在手机竖屏时也不受影响（它们本来就没有文字） */
+  #refreshButton,
+  #refreshListButton {
+    /* 保持原样，无需特殊处理 */
   }
 }
 

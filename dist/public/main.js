@@ -29,22 +29,22 @@
           refreshContainer.className = 'refresh-container'
           parent.parentNode.insertBefore(refreshContainer, parent)
           
-          // 添加刷新页面按钮
+          // 添加刷新页面按钮（只保留图标，移除文字标签）
           if (config.enableRefreshBtn) {
             const refreshPageBtn = document.createElement('button')
             refreshPageBtn.id = 'refreshButton'
             refreshPageBtn.title = 'Refresh page'
-            refreshPageBtn.innerHTML = '<span aria-hidden="true">♻</span> <span class="btn-label">Refresh page</span>'
+            refreshPageBtn.innerHTML = '<span aria-hidden="true">♻</span>'
             refreshPageBtn.addEventListener('click', () => location.reload(true))
             refreshContainer.appendChild(refreshPageBtn)
           }
           
-          // 添加刷新列表按钮
+          // 添加刷新列表按钮（只保留图标，移除文字标签）
           if (config.enableRefreshListBtn) {
             const refreshListBtn = document.createElement('button')
             refreshListBtn.id = 'refreshListButton'
             refreshListBtn.title = 'Refresh list'
-            refreshListBtn.innerHTML = '<span aria-hidden="true">▤</span> <span class="btn-label">Refresh list</span>'
+            refreshListBtn.innerHTML = '<span aria-hidden="true">▤</span>'
             refreshListBtn.addEventListener('click', () => HFS.reloadList())
             refreshContainer.appendChild(refreshListBtn)
           }
@@ -93,11 +93,11 @@
     }
   }
 
-  // 菜单栏按钮（刷新和全屏）
+  // 菜单栏按钮（刷新和全屏）- 保留文字标签
   HFS.onEvent('appendMenuBar', () => {
     const buttons = []
     
-    // 添加页面刷新按钮（菜单栏版本）
+    // 添加页面刷新按钮（菜单栏版本）- 保留文字标签
     if (config.enablePageRefreshBtn) {
       buttons.push(
         h('button', {
@@ -111,7 +111,7 @@
       )
     }
     
-    // 添加全屏按钮
+    // 添加全屏按钮 - 保留文字标签
     if (config.enableFullscreenBtn) {
       buttons.push(
         h('button', {
@@ -128,7 +128,7 @@
     return buttons
   })
 
-  // 预览控制栏全屏按钮
+  // 预览控制栏全屏按钮 - 保留文字标签
   if (config.enableFullscreenBtn) {
     setInterval(() => {
       const controls = document.querySelector('.file-show .bar .controls')
