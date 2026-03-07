@@ -1,9 +1,9 @@
-exports.version = 1.3
+exports.version = 1.5
 exports.apiRequired = 8.65
 exports.description = "Frontend UI toggle plugin, Some relatively minor tweaks—perhaps not useful to others, but at least meaningful to me."
 exports.repo = "Hug3O/Frontend-ui-toggles"
 exports.frontend_js = "main.js"
-
+exports.frontend_css = "style.css"
 exports.config = {
   hideHomeBtn: {
     type: 'boolean',
@@ -45,7 +45,7 @@ exports.config = {
     label: 'Show Refresh Button',
     defaultValue: true,
     frontend: true,
-    helperText: 'Show a small button (◤) above the breadcrumb area to reload the page content.'
+    helperText: 'Show a small button (♻) above the breadcrumb area to reload the page content.'
   },
   enableFullscreenBtn: {
     type: 'boolean',
@@ -53,5 +53,19 @@ exports.config = {
     defaultValue: true,
     frontend: true,
     helperText: 'Display a fullscreen toggle button in the top menu and preview area for fullscreen viewing.'
+  },
+  enableRefreshListBtn: {
+    type: 'boolean',
+    label: 'Show Refresh List Button',
+    defaultValue: false,
+    frontend: true,
+    helperText: 'Show a refresh list button in the menu for refreshing the file list without reloading the entire page.'
+  },
+  enablePageRefreshBtn: {
+    type: 'boolean',
+    label: 'Show Page Refresh Button',
+    defaultValue: false,
+    frontend: true,
+    helperText: 'Show a page refresh button in the menu bar next to the fullscreen button.'
   }
 }

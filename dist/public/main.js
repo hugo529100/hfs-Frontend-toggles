@@ -18,100 +18,128 @@
 
   HFS.watchState('list', updateUI, true)
 
-  if (config.enableRefreshBtn) {
+  // 刷新按钮功能
+  if (config.enableRefreshBtn || config.enableRefreshListBtn) {
     HFS.onEvent('afterBreadcrumbs', () => {
-      const style = h('style', {}, `
-        #refreshButton {
-          padding: 6px 10px;
-          font-size: 14px;
-          cursor: pointer;
-        }
-      `)
-
-      const btn = document.createElement('button')
-      btn.id = 'refreshButton'
-      btn.title = 'Refresh page'
-      btn.textContent = '◤'
-      btn.style.padding = '6px 10px'
-      btn.style.fontSize = '14px'
-      btn.style.cursor = 'pointer'
-      btn.addEventListener('click', () => location.reload(true))
-
       setTimeout(() => {
         const parent = document.querySelector('#breadcrumb-parent')
         if (parent && !document.getElementById('refreshButton')) {
-          parent.parentNode.insertBefore(btn, parent)
+          // 创建刷新容器
+          const refreshContainer = document.createElement('div')
+          refreshContainer.className = 'refresh-container'
+          parent.parentNode.insertBefore(refreshContainer, parent)
+          
+          // 添加刷新页面按钮
+          if (config.enableRefreshBtn) {
+            const refreshPageBtn = document.createElement('button')
+            refreshPageBtn.id = 'refreshButton'
+            refreshPageBtn.title = 'Refresh page'
+            refreshPageBtn.innerHTML = '<span aria-hidden="true">♻</span> <span class="btn-label">Refresh page</span>'
+            refreshPageBtn.addEventListener('click', () => location.reload(true))
+            refreshContainer.appendChild(refreshPageBtn)
+          }
+          
+          // 添加刷新列表按钮
+          if (config.enableRefreshListBtn) {
+            const refreshListBtn = document.createElement('button')
+            refreshListBtn.id = 'refreshListButton'
+            refreshListBtn.title = 'Refresh list'
+            refreshListBtn.innerHTML = '<span aria-hidden="true">▤</span> <span class="btn-label">Refresh list</span>'
+            refreshListBtn.addEventListener('click', () => HFS.reloadList())
+            refreshContainer.appendChild(refreshListBtn)
+          }
         }
       }, 0)
-
-      return style
     })
   }
 
-  if (config.enableFullscreenBtn) {
-    let isFullscreen = false
-    let fullscreenChangeHandler = null
+  // 全屏按钮功能
+  let isFullscreen = false
+  let fullscreenChangeHandler = null
 
-    const toggleFullscreen = () => {
-      const el = document.documentElement
-      
-      if (!isFullscreen) {
-        // 进入全屏
-        el.requestFullscreen?.()
-          .then(() => {
-            isFullscreen = true
-            
-            // 添加防止手势返回的监听
-            if (fullscreenChangeHandler) {
-              document.removeEventListener('fullscreenchange', fullscreenChangeHandler)
+  const toggleFullscreen = () => {
+    const el = document.documentElement
+    
+    if (!isFullscreen) {
+      el.requestFullscreen?.()
+        .then(() => {
+          isFullscreen = true
+          
+          if (fullscreenChangeHandler) {
+            document.removeEventListener('fullscreenchange', fullscreenChangeHandler)
+          }
+          
+          fullscreenChangeHandler = () => {
+            if (!document.fullscreenElement) {
+              el.requestFullscreen?.().catch(() => {
+                isFullscreen = false
+              })
             }
-            
-            fullscreenChangeHandler = () => {
-              if (!document.fullscreenElement) {
-                // 如果检测到退出全屏，立即重新进入全屏
-                el.requestFullscreen?.().catch(() => {
-                  isFullscreen = false
-                })
-              }
-            }
-            
-            document.addEventListener('fullscreenchange', fullscreenChangeHandler)
-          })
-          .catch(err => {
-            HFS.toast("Enter fullscreen failed: " + err, 'error')
-          })
-      } else {
-        // 退出全屏
-        if (fullscreenChangeHandler) {
-          document.removeEventListener('fullscreenchange', fullscreenChangeHandler)
-          fullscreenChangeHandler = null
-        }
-        
-        document.exitFullscreen?.()
-        isFullscreen = false
+          }
+          
+          document.addEventListener('fullscreenchange', fullscreenChangeHandler)
+        })
+        .catch(err => {
+          HFS.toast("Enter fullscreen failed: " + err, 'error')
+        })
+    } else {
+      if (fullscreenChangeHandler) {
+        document.removeEventListener('fullscreenchange', fullscreenChangeHandler)
+        fullscreenChangeHandler = null
       }
+      
+      document.exitFullscreen?.()
+      isFullscreen = false
     }
+  }
 
-    // 添加全屏按钮到菜单栏
-    HFS.onEvent('appendMenuBar', () => {
-      return h(HFS.Btn, {
-        icon: '⛶',
-        tooltip: 'Toggle Fullscreen',
-        onClick: toggleFullscreen
-      })
-    })
+  // 菜单栏按钮（刷新和全屏）
+  HFS.onEvent('appendMenuBar', () => {
+    const buttons = []
+    
+    // 添加页面刷新按钮（菜单栏版本）
+    if (config.enablePageRefreshBtn) {
+      buttons.push(
+        h('button', {
+          className: 'menu-bar-refresh-btn',
+          onClick: () => location.reload(true),
+          title: 'Refresh Page'
+        }, [
+          h('span', { 'aria-hidden': 'true' }, '♻ '),
+          h('span', { className: 'btn-label' }, 'Refresh')
+        ])
+      )
+    }
+    
+    // 添加全屏按钮
+    if (config.enableFullscreenBtn) {
+      buttons.push(
+        h('button', {
+          className: 'menu-bar-fullscreen-btn',
+          onClick: toggleFullscreen,
+          title: 'Toggle Fullscreen'
+        }, [
+          h('span', { 'aria-hidden': 'true' }, '⛶'),
+          h('span', { className: 'btn-label' }, 'Fullscreen')
+        ])
+      )
+    }
+    
+    return buttons
+  })
 
-    // 添加全屏按钮到预览控制栏
+  // 预览控制栏全屏按钮
+  if (config.enableFullscreenBtn) {
     setInterval(() => {
       const controls = document.querySelector('.file-show .bar .controls')
       const closeBtn = controls?.querySelector('button[title="Close"]')
-      const exists = controls?.querySelector('.fullscreen-toggle')
+      const exists = controls?.querySelector('.preview-controls-fullscreen-btn')
 
       if (controls && closeBtn && !exists) {
         const btn = document.createElement('button')
-        btn.className = 'fullscreen-toggle icon-button'
+        btn.className = 'preview-controls-fullscreen-btn'
         btn.title = 'Toggle Fullscreen'
-        btn.innerHTML = '<span aria-hidden="true">⛶</span>'
+        btn.innerHTML = '<span aria-hidden="true">⛶</span> <span class="btn-label">Fullscreen</span>'
         btn.onclick = toggleFullscreen
         controls.insertBefore(btn, closeBtn)
       }

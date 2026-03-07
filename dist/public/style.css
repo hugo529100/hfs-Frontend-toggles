@@ -1,0 +1,76 @@
+/* 刷新按钮样式 */
+#refreshButton {
+  padding: 6px 10px;
+  font-size: 14px;
+  height: 32px;
+  cursor: pointer;
+  color: var(--text) !important;
+}
+
+/* 刷新列表按钮样式 */
+#refreshListButton {
+  padding: 6px 10px;
+  font-size: 14px;
+  height: 32px;
+  cursor: pointer;
+  color: var(--text) !important;
+}
+
+/* 刷新容器样式 */
+.refresh-container {
+  display: inline-flex;
+  gap: 2px;
+  vertical-align: middle;
+  color: var(--text) !important;
+}
+
+/* 菜单栏刷新按钮样式 */
+.menu-bar-refresh-btn {
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--text) !important;
+  margin-left: 8px;
+}
+
+/* 菜单栏全屏按钮样式 */
+.menu-bar-fullscreen-btn {
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--text) !important;
+  margin-left: 8px;
+}
+
+/* 预览控制栏全屏按钮样式 */
+.preview-controls-fullscreen-btn {
+  padding: 1px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* 按钮标签文字样式（共用） */
+.btn-label {
+  display: inline;
+  margin-left: .4em;
+}
+
+/* 手机竖屏（宽度小于等于768px）时隐藏按钮文字，只显示图标 */
+@media (max-width: 768px) {
+  .menu-bar-refresh-btn .btn-label,
+  .menu-bar-fullscreen-btn .btn-label,
+  #refreshButton .btn-label,
+  #refreshListButton .btn-label,
+  .preview-controls-fullscreen-btn .btn-label {
+    display: none;
+  }
+}
+
+/* 隐藏元素的样式 */
+.breadcrumb:nth-of-type(2)[style*="display: none"],
+.breadcrumb:nth-of-type(1)[style*="display: none"],
+#zip-button[style*="display: none"],
+#select-button[style*="display: none"],
+#search-button[style*="display: none"] {
+  display: none !important;
+}
