@@ -67,15 +67,13 @@
 /* 手机竖屏（宽度小于等于768px）时隐藏按钮文字，只显示图标 */
 @media (max-width: 672px) {
   .menu-bar-refresh-btn .btn-label,
-  .menu-bar-fullscreen-btn .btn-label,
-  .preview-controls-fullscreen-btn .btn-label {
+  .menu-bar-fullscreen-btn .btn-label {
     display: none;
   }
   
-  /* 确保 #refreshButton 和 #refreshListButton 在手机竖屏时也不受影响（它们本来就没有文字） */
-  #refreshButton,
-  #refreshListButton {
-    /* 保持原样，无需特殊处理 */
+  /* 预览控制栏全屏按钮本来就没有文字，无需处理 */
+  .preview-controls-fullscreen-btn .btn-label {
+    display: none;
   }
 }
 

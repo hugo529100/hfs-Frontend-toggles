@@ -128,7 +128,7 @@
     return buttons
   })
 
-  // 预览控制栏全屏按钮 - 保留文字标签
+  // 预览控制栏全屏按钮 - 只保留图标，移除文字标签
   if (config.enableFullscreenBtn) {
     setInterval(() => {
       const controls = document.querySelector('.file-show .bar .controls')
@@ -139,7 +139,7 @@
         const btn = document.createElement('button')
         btn.className = 'preview-controls-fullscreen-btn'
         btn.title = 'Toggle Fullscreen'
-        btn.innerHTML = '<span aria-hidden="true">⛶</span> <span class="btn-label">Fullscreen</span>'
+        btn.innerHTML = '<span aria-hidden="true">⛶</span>' // 只保留图标，移除文字标签
         btn.onclick = toggleFullscreen
         controls.insertBefore(btn, closeBtn)
       }
