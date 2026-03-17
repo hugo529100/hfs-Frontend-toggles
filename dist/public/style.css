@@ -5,6 +5,7 @@
   height: 32px;
   cursor: pointer;
   color: var(--text) !important;
+  transition: all 0.2s ease; /* 添加平滑过渡效果 */
 }
 
 /* 刷新列表按钮样式 */
@@ -14,6 +15,7 @@
   height: 32px;
   cursor: pointer;
   color: var(--text) !important;
+  transition: all 0.2s ease;
 }
 
 /* 刷新容器样式 */
@@ -34,6 +36,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  transition: all 0.2s ease;
 }
 
 /* 菜单栏全屏按钮样式 */
@@ -46,6 +49,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  transition: all 0.2s ease;
 }
 
 /* 预览控制栏全屏按钮样式 */
@@ -56,6 +60,17 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  transition: all 0.2s ease;
+}
+
+/* 统一按钮悬停效果 */
+#refreshButton:hover,
+#refreshListButton:hover,
+.menu-bar-refresh-btn:hover,
+.menu-bar-fullscreen-btn:hover,
+.preview-controls-fullscreen-btn:hover {
+  background-color: var(--text) !important;
+  color: var(--bg) !important;
 }
 
 /* 按钮标签文字样式（共用） */
