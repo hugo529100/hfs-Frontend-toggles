@@ -120,7 +120,7 @@
           title: 'Toggle Fullscreen'
         }, [
           h('span', { 'aria-hidden': 'true' }, '⛶'),
-          h('span', { className: 'btn-label' }, 'Fullscreen')
+          h('span', { className: 'btn-label' }, 'Full')
         ])
       )
     }
