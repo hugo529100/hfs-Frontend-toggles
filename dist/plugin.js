@@ -1,5 +1,5 @@
 
-exports.version = 1.8
+exports.version = 1.9
 exports.apiRequired = 8.65
 exports.description = "Frontend UI customization plugin - Hide/show buttons, reorder menu bar, add refresh and fullscreen controls."
 exports.repo = "Hug3O/Frontend-ui-toggles"

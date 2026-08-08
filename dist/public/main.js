@@ -22,6 +22,9 @@
   // 按鈕排序功能
   let isReordering = false
   let reorderTimeout = null
+  let menuBarObserver = null
+  let menuBarObserverRetries = 0
+  const MAX_OBSERVER_RETRIES = 10
 
   const reorderButtons = () => {
     // 如果未啟用自定義排序，則跳過
@@ -127,7 +130,7 @@ menu-bar-walkie-btn`
       menuBar.appendChild(fragment)
       
     } catch (error) {
-      console.error('Reorder buttons error:', error)
+      // 靜默處理錯誤
     } finally {
       setTimeout(() => {
         isReordering = false
@@ -151,19 +154,29 @@ menu-bar-walkie-btn`
     setTimeout(scheduleReorder, 150)
   })
 
-  // 監聽菜單欄變化
-  let menuBarObserver = null
-
+  // 監聽菜單欄變化（改進版，有重試限制）
   const setupMenuBarObserver = () => {
+    // 如果重試次數超過限制，停止重試
+    if (menuBarObserverRetries >= MAX_OBSERVER_RETRIES) {
+      return
+    }
+
     const menuBar = document.getElementById('menu-bar')
     if (!menuBar) {
+      menuBarObserverRetries++
       setTimeout(setupMenuBarObserver, 200)
       return
     }
 
+    // 重置重試計數
+    menuBarObserverRetries = 0
+
     if (menuBarObserver) {
       menuBarObserver.disconnect()
+      menuBarObserver = null
     }
+
+    let observerTriggered = false
 
     menuBarObserver = new MutationObserver((mutations) => {
       let shouldReorder = false
@@ -176,8 +189,13 @@ menu-bar-walkie-btn`
         }
       }
       
-      if (shouldReorder) {
+      if (shouldReorder && !observerTriggered) {
+        observerTriggered = true
         scheduleReorder()
+        // 重置標誌，避免阻塞後續觸發
+        setTimeout(() => {
+          observerTriggered = false
+        }, 300)
       }
     })
 
@@ -309,9 +327,10 @@ menu-bar-walkie-btn`
     return buttons
   })
 
-  // 預覽控制欄全屏按鈕
+  // 預覽控制欄全屏按鈕（改進版）
   if (config.enableFullscreenBtn) {
     let previewButtonAdded = false
+    let previewObserver = null
     
     const addPreviewFullscreenButton = () => {
       if (previewButtonAdded) return
@@ -330,20 +349,31 @@ menu-bar-walkie-btn`
         btn.onclick = toggleFullscreen
         controls.insertBefore(btn, closeBtn)
         previewButtonAdded = true
+        
+        // 按鈕添加成功後，可以考慮停止觀察
+        if (previewObserver) {
+          previewObserver.disconnect()
+          previewObserver = null
+        }
       }
     }
 
-    const previewObserver = new MutationObserver(() => {
+    // 使用更精確的觀察目標
+    previewObserver = new MutationObserver(() => {
       addPreviewFullscreenButton()
     })
 
+    // 只觀察 body 的 childList 變化，減少不必要的觸發
     previewObserver.observe(document.body, {
       childList: true,
-      subtree: true,
+      subtree: false,
       attributes: false
     })
 
-    setTimeout(addPreviewFullscreenButton, 500)
-    setTimeout(addPreviewFullscreenButton, 1000)
+    // 延遲執行
+    const delays = [500, 1000, 2000]
+    delays.forEach(delay => {
+      setTimeout(addPreviewFullscreenButton, delay)
+    })
   }
 }
