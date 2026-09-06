@@ -1,8 +1,8 @@
-
-exports.version = 1.9
+// plugin.js
+exports.version = 2.4
 exports.apiRequired = 8.65
-exports.description = "Frontend UI customization plugin - Hide/show buttons, reorder menu bar, add refresh and fullscreen controls."
-exports.repo = "Hug3O/Frontend-ui-toggles"
+exports.description = "Frontend UI customization plugin - Hide/show buttons, reorder menu bar, add refresh, fullscreen controls, and collapse toggle."
+exports.repo = "Hug3O/Frontend-toggles"
 exports.frontend_js = "main.js"
 exports.frontend_css = "style.css"
 
@@ -13,6 +13,7 @@ exports.config = {
         label: 'Hide Home Button (breadcrumb 2)',
         defaultValue: false,
         frontend: true,
+        xs: 6,
         helperText: 'Hide the "Home" button, usually the second item in the breadcrumb navigation.'
     },
     hideBackBtn: {
@@ -20,13 +21,15 @@ exports.config = {
         label: 'Hide Back Button (breadcrumb 1)',
         defaultValue: false,
         frontend: true,
+        xs: 6,
         helperText: 'Hide the "Back" button, typically the first item in the breadcrumb navigation.'
     },
     hideZipBtn: {
         type: 'boolean',
         label: 'Hide Zip Download Button',
-        defaultValue: false,
+        defaultValue: true,
         frontend: true,
+        xs: 6,
         helperText: 'Hide the "Zip" button to prevent users from downloading the entire folder as a ZIP file.'
     },
     hideSelectBtn: {
@@ -34,6 +37,7 @@ exports.config = {
         label: 'Hide Select Button',
         defaultValue: false,
         frontend: true,
+        xs: 6,
         helperText: 'Hide the "Select" button, which is used to mark files for actions like Zip and Delete.'
     },
     hideSearchBtn: {
@@ -45,32 +49,36 @@ exports.config = {
     },
 
     // 功能開關
-    enableRefreshBtn: {
+    enableFullscreenBtn: {
         type: 'boolean',
-        label: 'Show Refresh Button',
+        label: 'Show Fullscreen Button',
         defaultValue: true,
         frontend: true,
-        helperText: 'Show a small button (▲) above the breadcrumb area to reload the page content.'
+        xs: 6,
+        helperText: 'Display a fullscreen toggle button (⛶) in the top menu and preview area for fullscreen viewing.'
     },
     enableRefreshListBtn: {
         type: 'boolean',
         label: 'Show Refresh List Button',
         defaultValue: false,
         frontend: true,
+        xs: 6,
         helperText: 'Show a refresh list button (▤) in the menu for refreshing the file list without reloading the entire page.'
     },
-    enableFullscreenBtn: {
+        enableRefreshBtn: {
         type: 'boolean',
-        label: 'Show Fullscreen Button',
-        defaultValue: true,
+        label: 'Show Refresh Button',
+        defaultValue: false,
         frontend: true,
-        helperText: 'Display a fullscreen toggle button (⛶) in the top menu and preview area for fullscreen viewing.'
+        xs: 6,
+        helperText: 'Show a small button (▲) above the breadcrumb area to reload the page content.'
     },
     enablePageRefreshBtn: {
         type: 'boolean',
         label: 'Show Page Refresh Button',
         defaultValue: false,
         frontend: true,
+        xs: 6,
         helperText: 'Show a page refresh button in the menu bar next to the fullscreen button.'
     },
 
@@ -82,14 +90,14 @@ exports.config = {
         frontend: true,
         helperText: 'Enable custom ordering of buttons in the menu bar.'
     },
-
     buttonOrder: {
         type: 'string',
         label: 'Button Order (one per line)',
         multiline: true,
         frontend: true,
         defaultValue: 
-`login-button
+`collapse-toggle-btn
+login-button
 user-button
 select-button
 upload-button
@@ -98,9 +106,34 @@ zip-button
 menu-bar-fullscreen-btn
 options-button
 hfs-sync-button
+menu-bar-walkie-btn
 menu-bar-qp-btn
 menu-bar-notes-btn
-menu-bar-walkie-btn`,
+menu-bar-music-btn`,
         helperText: 'Enter one button ID or class per line. Buttons will be displayed from top to bottom in this order. Use the exact ID or class name as shown in the HTML.'
+    },
+
+    // 收納菜單配置
+    enableCollapseMenu: {
+        type: 'boolean',
+        label: 'Enable Collapse Toggle Button',
+        defaultValue: false,
+        frontend: true,
+        helperText: 'Enable a toggle button (☰) at the start of menu bar to show/hide specified buttons. (Disabled by default to avoid conflict with hide buttons above)'
+    },
+    collapseButtons: {
+        type: 'string',
+        label: 'Buttons to Collapse (one per line)',
+        multiline: true,
+        frontend: true,
+        defaultValue: 
+`login-button
+user-button
+upload-button
+menu-bar-fullscreen-btn
+hfs-sync-button
+menu-bar-qp-btn
+menu-bar-walkie-btn`,
+        helperText: 'Enter one button ID or class per line. These buttons will be hidden/shown when toggling. Note: If a button is hidden by the options above, it will not appear in the collapse menu.'
     }
 }
