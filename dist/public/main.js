@@ -1,7 +1,8 @@
 // main.js - Tile Size 按鈕放在 breadcrumb 上方一行（同 refresh 按鈕）
-// 單擊：list(0) ▤ ↔ 服務器默認 ▦（兩態切換）；tile6 狀態下單擊 → 服務器默認 ▦
+// 單擊：list(0) ▤ ↔ 服務器默認 ▦；tile6 狀態下單擊 → 服務器默認 ▦
 // 雙擊：直接跳到 tile6 ▣
 // 圖標規則：0 → ▤ ；1-5 → ▦ ；6-10 → ▣
+// 服務器默認值來源：config.serverTileSize（後端 exports.init 從 config.yaml 嗅探）
 'use strict'; {
     const config = HFS.getPluginConfig()
     const h = HFS.h
@@ -216,42 +217,33 @@ menu-bar-walkie-btn`
 
     // ============================================================
     // 4. 新增功能：Tile Size 快速切換（放在 breadcrumb 上方一行）
-    //    單擊：list(0) ▤ ↔ 服務器默認 ▦（兩態切換）；tile6 狀態下單擊 → 服務器默認 ▦
+    //    單擊：list(0) ▤ ↔ 服務器默認 ▦；tile6 狀態下單擊 → 服務器默認 ▦
     //    雙擊：直接跳到 tile6 ▣
     //    圖標規則：0 → ▤ ；1-5 → ▦ ；6-10 → ▣
+    //    服務器默認值來源：config.serverTileSize（後端 exports.init 從 config.yaml 嗅探）
     // ============================================================
     let tileSizeClickTimer = null
     let currentTileSize = null // 當前實際 tile_size 數值
-    let serverTileSizeCache = null
 
-    const getServerTileSize = () => {
-        // 首次取得後緩存，避免後續 tile_size 被改成 6 後無法反推默認值
-        if (serverTileSizeCache !== null) return serverTileSizeCache
+    // 服務器默認值（來自後端 config.yaml 嗅探），只在初始化時確定一次
+    const SERVER_DEFAULT_TILE_SIZE = (() => {
         try {
-            if (HFS.state && HFS.state.tile_size !== undefined) {
-                const v = HFS.state.tile_size
-                if (typeof v === 'number' && v > 0 && v !== 6) {
-                    serverTileSizeCache = v
-                    return v
-                }
-                if (typeof v === 'number' && v === 6) {
-                    // 當前剛好是 6，無法從中得知服務器默認，退回 2
-                    serverTileSizeCache = 2
-                    return 2
-                }
+            const v = config.serverTileSize
+            if (typeof v === 'number' && v > 0) return v
+            if (typeof v === 'string') {
+                const parsed = parseInt(v)
+                if (!isNaN(parsed) && parsed > 0) return parsed
             }
         } catch (e) {}
-        serverTileSizeCache = 2
+        // 嗅探失敗時退回 2
         return 2
-    }
+    })()
 
     // 按實際 tile_size 數值回傳圖標
     const getTileSizeIconByValue = (value) => {
         if (value === 0) return '▤'
         if (typeof value === 'number' && value >= 1 && value <= 5) return '▦'
         if (typeof value === 'number' && value >= 6) return '▣'
-        // 後備
-        if (value === 0) return '▤'
         return '▦'
     }
 
@@ -276,14 +268,13 @@ menu-bar-walkie-btn`
 
     // 依模式設定 tile size，並記錄數值
     const setTileMode = (mode) => {
-        const serverDefault = getServerTileSize()
         let size
         if (mode === 'list') {
             size = 0
         } else if (mode === 'tile6') {
             size = 6
         } else {
-            size = serverDefault
+            size = SERVER_DEFAULT_TILE_SIZE
         }
         applyTileSize(size)
         updateTileSizeButtonIcon()
@@ -291,7 +282,7 @@ menu-bar-walkie-btn`
 
     // 單擊：
     //   list(0) → 服務器默認
-    //   tile6  → 服務器默認
+    //   tile6(>=6) → 服務器默認
     //   其它(1-5 默認) → list
     const handleTileSizeClick = () => {
         if (tileSizeClickTimer) {
@@ -304,10 +295,10 @@ menu-bar-walkie-btn`
         tileSizeClickTimer = setTimeout(() => {
             tileSizeClickTimer = null
             if (currentTileSize === 0) {
-                // list → 默認
+                // list → 服務器默認
                 setTileMode('default')
             } else if (typeof currentTileSize === 'number' && currentTileSize >= 6) {
-                // tile6 → 默認（而非 list）
+                // tile6 → 服務器默認（而非回到用戶手動設置的 tile7）
                 setTileMode('default')
             } else {
                 // 默認(1-5) → list
@@ -330,10 +321,6 @@ menu-bar-walkie-btn`
             const v = HFS.state && HFS.state.tile_size
             if (typeof v === 'number') {
                 currentTileSize = v
-                // 首次遇到非 0 且非 6 的值，視為服務器默認值
-                if (serverTileSizeCache === null && v > 0 && v !== 6) {
-                    serverTileSizeCache = v
-                }
             } else {
                 currentTileSize = null
             }
@@ -347,9 +334,6 @@ menu-bar-walkie-btn`
     HFS.watchState('tile_size', (value) => {
         if (typeof value === 'number') {
             currentTileSize = value
-            if (serverTileSizeCache === null && value > 0 && value !== 6) {
-                serverTileSizeCache = value
-            }
         } else {
             currentTileSize = null
         }

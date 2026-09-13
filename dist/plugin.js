@@ -1,6 +1,6 @@
 // plugin.js
-exports.version = 2.7
-exports.apiRequired = 8.65
+exports.version = 2.9
+exports.apiRequired = 9.6
 exports.description = "Frontend UI customization plugin - Hide/show buttons, reorder menu bar, add refresh, fullscreen controls, tile size toggle, and collapse toggle."
 exports.repo = "Hug3O/Frontend-toggles"
 exports.frontend_js = "main.js"
@@ -73,10 +73,10 @@ exports.config = {
         label: 'Show Tile Size Toggle Button',
         defaultValue: true,
         frontend: true,
-
-        helperText: 'Show a tile size toggle button above the breadcrumb area. Click to cycle: list mode ▤ (0) → server default ▦. Double-click to jump directly to tile 6.'
+        helperText: 'Show a tile size toggle button above the breadcrumb area. Click: list ▤ (0) ↔ server default ▦; at tile6, click returns to server default ▦. Double-click: jump to tile6 ▣. Server default is sniffed from backend config.yaml.'
     },
-        enableRefreshListBtn: {
+
+    enableRefreshListBtn: {
         type: 'boolean',
         label: 'Show Refresh List Button',
         defaultValue: false,
@@ -84,7 +84,8 @@ exports.config = {
         xs: 6,
         helperText: 'Show a refresh list button (↺) in the menu for refreshing the file list without reloading the entire page.'
     },
-        enableRefreshBtn: {
+
+    enableRefreshBtn: {
         type: 'boolean',
         label: 'Show Refresh Button',
         defaultValue: false,
@@ -92,6 +93,7 @@ exports.config = {
         xs: 6,
         helperText: 'Show a small button (▲) above the breadcrumb area to reload the page content.'
     },
+
     // 按鈕排序配置
     buttonOrderEnabled: {
         type: 'boolean',
@@ -145,5 +147,29 @@ hfs-sync-button
 menu-bar-qp-btn
 menu-bar-walkie-btn`,
         helperText: 'Enter one button ID or class per line. These buttons will be hidden/shown when toggling. Note: If a button is hidden by the options above, it will not appear in the collapse menu.'
+    }
+}
+
+// ============================================================
+// 後端初始化：從 HFS 的 config.yaml 嗅探 tile_size 默認值
+// 通過 setPluginConfig 傳給前端（前端讀 config.serverTileSize）
+// ============================================================
+exports.init = (api) => {
+    let serverTileSize
+
+    try {
+        const hfsConfig = api.getHfsConfig()
+        if (hfsConfig && hfsConfig.tile_size !== undefined) {
+            const parsed = parseInt(hfsConfig.tile_size)
+            if (!isNaN(parsed) && parsed > 0) {
+                serverTileSize = parsed
+            }
+        }
+    } catch (e) {
+        // 嗅探失敗，保持 undefined，前端會退回 2
+    }
+
+    if (api.setPluginConfig) {
+        api.setPluginConfig('serverTileSize', serverTileSize)
     }
 }
