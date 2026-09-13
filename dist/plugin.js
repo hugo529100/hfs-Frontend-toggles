@@ -74,7 +74,7 @@ exports.config = {
         defaultValue: true,
         frontend: true,
 
-        helperText: 'Show a tile size toggle button above the breadcrumb area (same row as refresh buttons). Click to cycle: list mode ▤ (0) → server default ▦ → tile 6 ▣ → list mode. Double-click to jump directly to tile 6.'
+        helperText: 'Show a tile size toggle button above the breadcrumb area. Click to cycle: list mode ▤ (0) → server default ▦. Double-click to jump directly to tile 6.'
     },
         enableRefreshListBtn: {
         type: 'boolean',
