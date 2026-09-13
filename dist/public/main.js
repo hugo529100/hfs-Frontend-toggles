@@ -1,4 +1,7 @@
-// main.js - 修復 collapse-toggle-btn 文字標籤 (最小化改進)
+// main.js - Tile Size 按鈕放在 breadcrumb 上方一行（同 refresh 按鈕）
+// 單擊：list(0) ▤ ↔ 服務器默認 ▦（兩態切換）
+// 雙擊：直接跳到 tile6 ▣
+// 圖標規則：0 → ▤ ；1-5 → ▦ ；6-10 → ▣
 'use strict'; {
     const config = HFS.getPluginConfig()
     const h = HFS.h
@@ -212,33 +215,206 @@ menu-bar-walkie-btn`
     })
 
     // ============================================================
-    // 4. 原有功能：刷新按鈕
+    // 4. 新增功能：Tile Size 快速切換（放在 breadcrumb 上方一行）
+    //    單擊：list(0) ▤ ↔ 服務器默認 ▦（兩態切換）
+    //    雙擊：直接跳到 tile6 ▣
+    //    圖標規則：0 → ▤ ；1-5 → ▦ ；6-10 → ▣
+    // ============================================================
+    let tileSizeClickTimer = null
+    let currentTileSize = null // 當前實際 tile_size 數值
+    let serverTileSizeCache = null
+
+    const getServerTileSize = () => {
+        // 首次取得後緩存，避免後續 tile_size 被改成 6 後無法反推默認值
+        if (serverTileSizeCache !== null) return serverTileSizeCache
+        try {
+            if (HFS.state && HFS.state.tile_size !== undefined) {
+                const v = HFS.state.tile_size
+                if (typeof v === 'number' && v > 0 && v !== 6) {
+                    serverTileSizeCache = v
+                    return v
+                }
+                if (typeof v === 'number' && v === 6) {
+                    // 當前剛好是 6，無法從中得知服務器默認，退回 2
+                    serverTileSizeCache = 2
+                    return 2
+                }
+            }
+        } catch (e) {}
+        serverTileSizeCache = 2
+        return 2
+    }
+
+    // 按實際 tile_size 數值回傳圖標
+    const getTileSizeIconByValue = (value) => {
+        if (value === 0) return '▤'
+        if (typeof value === 'number' && value >= 1 && value <= 5) return '▦'
+        if (typeof value === 'number' && value >= 6) return '▣'
+        // 後備
+        if (value === 0) return '▤'
+        return '▦'
+    }
+
+    const getTileSizeIcon = () => {
+        if (currentTileSize === null || currentTileSize === undefined) return '▦'
+        return getTileSizeIconByValue(currentTileSize)
+    }
+
+    const updateTileSizeButtonIcon = () => {
+        const btn = document.getElementById('tileSizeButton')
+        if (!btn) return
+        const iconSpan = btn.querySelector('span[aria-hidden="true"]')
+        if (iconSpan) iconSpan.textContent = getTileSizeIcon()
+    }
+
+    const applyTileSize = (size) => {
+        try {
+            if (HFS.state) HFS.state.tile_size = size
+            currentTileSize = size
+        } catch (e) {}
+    }
+
+    // 依模式設定 tile size，並記錄數值
+    const setTileMode = (mode) => {
+        const serverDefault = getServerTileSize()
+        let size
+        if (mode === 'list') {
+            size = 0
+        } else if (mode === 'tile6') {
+            size = 6
+        } else {
+            size = serverDefault
+        }
+        applyTileSize(size)
+        updateTileSizeButtonIcon()
+    }
+
+    // 單擊：list(0) ▤ ↔ 服務器默認 ▦（兩態切換）
+    const handleTileSizeClick = () => {
+        if (tileSizeClickTimer) {
+            // 已經在等待雙擊，這次當作雙擊處理
+            clearTimeout(tileSizeClickTimer)
+            tileSizeClickTimer = null
+            setTileMode('tile6')
+            return
+        }
+        tileSizeClickTimer = setTimeout(() => {
+            tileSizeClickTimer = null
+            // 兩態切換：list(0) ↔ default
+            // 判斷當前值：0 → default；其他（含 1-5 與 6-10）→ list
+            if (currentTileSize === 0) {
+                setTileMode('default')
+            } else {
+                setTileMode('list')
+            }
+        }, 250)
+    }
+
+    // 雙擊：直接跳到 tile6
+    const handleTileSizeDblClick = () => {
+        if (tileSizeClickTimer) {
+            clearTimeout(tileSizeClickTimer)
+            tileSizeClickTimer = null
+        }
+        setTileMode('tile6')
+    }
+
+    const initTileSizeMode = () => {
+        try {
+            const v = HFS.state && HFS.state.tile_size
+            if (typeof v === 'number') {
+                currentTileSize = v
+                // 首次遇到非 0 且非 6 的值，視為服務器默認值
+                if (serverTileSizeCache === null && v > 0 && v !== 6) {
+                    serverTileSizeCache = v
+                }
+            } else {
+                currentTileSize = null
+            }
+        } catch (e) {
+            currentTileSize = null
+        }
+        updateTileSizeButtonIcon()
+    }
+
+    // 監聽 tile_size 變化，保持圖標同步
+    HFS.watchState('tile_size', (value) => {
+        if (typeof value === 'number') {
+            currentTileSize = value
+            if (serverTileSizeCache === null && value > 0 && value !== 6) {
+                serverTileSizeCache = value
+            }
+        } else {
+            currentTileSize = null
+        }
+        updateTileSizeButtonIcon()
+    })
+
+    // 在 breadcrumb 上方一行插入 tile size 按鈕
+    if (config.enableTileSizeBtn) {
+        HFS.onEvent('afterBreadcrumbs', () => {
+            setTimeout(() => {
+                const parent = document.querySelector('#breadcrumb-parent')
+                if (!parent) return
+
+                // 找到或建立 refresh-container（與 refresh 按鈕共用同一行）
+                let container = parent.parentNode.querySelector('.refresh-container')
+                if (!container) {
+                    container = document.createElement('div')
+                    container.className = 'refresh-container'
+                    parent.parentNode.insertBefore(container, parent)
+                }
+
+                if (document.getElementById('tileSizeButton')) {
+                    initTileSizeMode()
+                    return
+                }
+
+                const btn = document.createElement('button')
+                btn.id = 'tileSizeButton'
+                btn.title = 'Toggle tile size (click: list/default, double-click: tile 6)'
+                btn.innerHTML = '<span aria-hidden="true">' + getTileSizeIcon() + '</span>'
+
+                btn.addEventListener('click', handleTileSizeClick)
+                btn.addEventListener('dblclick', handleTileSizeDblClick)
+
+                container.appendChild(btn)
+                initTileSizeMode()
+            }, 0)
+        })
+    }
+
+    // ============================================================
+    // 5. 原有功能：刷新按鈕
     // ============================================================
     if (config.enableRefreshBtn || config.enableRefreshListBtn) {
         HFS.onEvent('afterBreadcrumbs', () => {
             setTimeout(() => {
                 const parent = document.querySelector('#breadcrumb-parent')
-                if (parent && !document.getElementById('refreshButton')) {
-                    const refreshContainer = document.createElement('div')
-                    refreshContainer.className = 'refresh-container'
-                    parent.parentNode.insertBefore(refreshContainer, parent)
-                    
-                    if (config.enableRefreshBtn) {
+                if (parent) {
+                    let container = parent.parentNode.querySelector('.refresh-container')
+                    if (!container) {
+                        container = document.createElement('div')
+                        container.className = 'refresh-container'
+                        parent.parentNode.insertBefore(container, parent)
+                    }
+
+                    if (config.enableRefreshBtn && !document.getElementById('refreshButton')) {
                         const refreshPageBtn = document.createElement('button')
                         refreshPageBtn.id = 'refreshButton'
                         refreshPageBtn.title = 'Refresh page'
                         refreshPageBtn.innerHTML = '<span aria-hidden="true">▲</span>'
                         refreshPageBtn.addEventListener('click', () => location.reload(true))
-                        refreshContainer.appendChild(refreshPageBtn)
+                        container.appendChild(refreshPageBtn)
                     }
-                    
-                    if (config.enableRefreshListBtn) {
+
+                    if (config.enableRefreshListBtn && !document.getElementById('refreshListButton')) {
                         const refreshListBtn = document.createElement('button')
                         refreshListBtn.id = 'refreshListButton'
                         refreshListBtn.title = 'Refresh list'
-                        refreshListBtn.innerHTML = '<span aria-hidden="true">▤</span>'
+                        refreshListBtn.innerHTML = '<span aria-hidden="true">↺</span>'
                         refreshListBtn.addEventListener('click', () => HFS.reloadList())
-                        refreshContainer.appendChild(refreshListBtn)
+                        container.appendChild(refreshListBtn)
                     }
                 }
             }, 0)
@@ -246,7 +422,7 @@ menu-bar-walkie-btn`
     }
 
     // ============================================================
-    // 5. 原有功能：全屏按鈕
+    // 6. 原有功能：全屏按鈕
     // ============================================================
     let isFullscreen = false
     let fullscreenChangeHandler = null
@@ -379,7 +555,7 @@ menu-bar-walkie-btn`
     }
 
     // ============================================================
-    // 6. 收納菜單功能（先排序後隱藏）
+    // 7. 收納菜單功能（先排序後隱藏）
     // ============================================================
     const isCollapseEnabled = () => {
         return config.enableCollapseMenu === true
@@ -732,6 +908,10 @@ menu-bar-walkie-btn`
         if (collapseToggleButton) {
             collapseToggleButton.remove()
             collapseToggleButton = null
+        }
+        if (tileSizeClickTimer) {
+            clearTimeout(tileSizeClickTimer)
+            tileSizeClickTimer = null
         }
         document.removeEventListener('click', handleOutsideClick)
     })

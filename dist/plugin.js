@@ -1,7 +1,7 @@
 // plugin.js
-exports.version = 2.4
+exports.version = 2.7
 exports.apiRequired = 8.65
-exports.description = "Frontend UI customization plugin - Hide/show buttons, reorder menu bar, add refresh, fullscreen controls, and collapse toggle."
+exports.description = "Frontend UI customization plugin - Hide/show buttons, reorder menu bar, add refresh, fullscreen controls, tile size toggle, and collapse toggle."
 exports.repo = "Hug3O/Frontend-toggles"
 exports.frontend_js = "main.js"
 exports.frontend_css = "style.css"
@@ -45,6 +45,7 @@ exports.config = {
         label: 'Hide Search Button',
         defaultValue: false,
         frontend: true,
+        xs: 6,
         helperText: 'Hide the "Search" button, used for filtering the visible file list.'
     },
 
@@ -57,22 +58,7 @@ exports.config = {
         xs: 6,
         helperText: 'Display a fullscreen toggle button (⛶) in the top menu and preview area for fullscreen viewing.'
     },
-    enableRefreshListBtn: {
-        type: 'boolean',
-        label: 'Show Refresh List Button',
-        defaultValue: false,
-        frontend: true,
-        xs: 6,
-        helperText: 'Show a refresh list button (▤) in the menu for refreshing the file list without reloading the entire page.'
-    },
-        enableRefreshBtn: {
-        type: 'boolean',
-        label: 'Show Refresh Button',
-        defaultValue: false,
-        frontend: true,
-        xs: 6,
-        helperText: 'Show a small button (▲) above the breadcrumb area to reload the page content.'
-    },
+
     enablePageRefreshBtn: {
         type: 'boolean',
         label: 'Show Page Refresh Button',
@@ -82,6 +68,30 @@ exports.config = {
         helperText: 'Show a page refresh button in the menu bar next to the fullscreen button.'
     },
 
+    enableTileSizeBtn: {
+        type: 'boolean',
+        label: 'Show Tile Size Toggle Button',
+        defaultValue: true,
+        frontend: true,
+
+        helperText: 'Show a tile size toggle button above the breadcrumb area (same row as refresh buttons). Click to cycle: list mode ▤ (0) → server default ▦ → tile 6 ▣ → list mode. Double-click to jump directly to tile 6.'
+    },
+        enableRefreshListBtn: {
+        type: 'boolean',
+        label: 'Show Refresh List Button',
+        defaultValue: false,
+        frontend: true,
+        xs: 6,
+        helperText: 'Show a refresh list button (↺) in the menu for refreshing the file list without reloading the entire page.'
+    },
+        enableRefreshBtn: {
+        type: 'boolean',
+        label: 'Show Refresh Button',
+        defaultValue: false,
+        frontend: true,
+        xs: 6,
+        helperText: 'Show a small button (▲) above the breadcrumb area to reload the page content.'
+    },
     // 按鈕排序配置
     buttonOrderEnabled: {
         type: 'boolean',

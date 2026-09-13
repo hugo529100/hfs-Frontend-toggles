@@ -1,4 +1,4 @@
-/* style.css - 添加 collapse-toggle-btn 文字標籤樣式 */
+/* style.css - 保持原樣，不新增多餘 CSS */
 /* 刷新按钮样式 */
 #refreshButton {
   padding: 6px 10px;
@@ -9,6 +9,14 @@
 }
 
 #refreshListButton {
+  padding: 6px 10px;
+  font-size: 14px;
+  height: 32px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#tileSizeButton {
   padding: 6px 10px;
   font-size: 14px;
   height: 32px;
