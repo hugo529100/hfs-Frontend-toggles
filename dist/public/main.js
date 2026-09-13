@@ -1,5 +1,5 @@
 // main.js - Tile Size 按鈕放在 breadcrumb 上方一行（同 refresh 按鈕）
-// 單擊：list(0) ▤ ↔ 服務器默認 ▦（兩態切換）
+// 單擊：list(0) ▤ ↔ 服務器默認 ▦（兩態切換）；tile6 狀態下單擊 → 服務器默認 ▦
 // 雙擊：直接跳到 tile6 ▣
 // 圖標規則：0 → ▤ ；1-5 → ▦ ；6-10 → ▣
 'use strict'; {
@@ -216,7 +216,7 @@ menu-bar-walkie-btn`
 
     // ============================================================
     // 4. 新增功能：Tile Size 快速切換（放在 breadcrumb 上方一行）
-    //    單擊：list(0) ▤ ↔ 服務器默認 ▦（兩態切換）
+    //    單擊：list(0) ▤ ↔ 服務器默認 ▦（兩態切換）；tile6 狀態下單擊 → 服務器默認 ▦
     //    雙擊：直接跳到 tile6 ▣
     //    圖標規則：0 → ▤ ；1-5 → ▦ ；6-10 → ▣
     // ============================================================
@@ -289,7 +289,10 @@ menu-bar-walkie-btn`
         updateTileSizeButtonIcon()
     }
 
-    // 單擊：list(0) ▤ ↔ 服務器默認 ▦（兩態切換）
+    // 單擊：
+    //   list(0) → 服務器默認
+    //   tile6  → 服務器默認
+    //   其它(1-5 默認) → list
     const handleTileSizeClick = () => {
         if (tileSizeClickTimer) {
             // 已經在等待雙擊，這次當作雙擊處理
@@ -300,11 +303,14 @@ menu-bar-walkie-btn`
         }
         tileSizeClickTimer = setTimeout(() => {
             tileSizeClickTimer = null
-            // 兩態切換：list(0) ↔ default
-            // 判斷當前值：0 → default；其他（含 1-5 與 6-10）→ list
             if (currentTileSize === 0) {
+                // list → 默認
+                setTileMode('default')
+            } else if (typeof currentTileSize === 'number' && currentTileSize >= 6) {
+                // tile6 → 默認（而非 list）
                 setTileMode('default')
             } else {
+                // 默認(1-5) → list
                 setTileMode('list')
             }
         }, 250)
