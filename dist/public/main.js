@@ -677,11 +677,11 @@ menu-bar-walkie-btn`
         
         const iconSpan = document.createElement('span')
         iconSpan.setAttribute('aria-hidden', 'true')
-        iconSpan.textContent = expanded ? '✕' : 'Ⓜ'
+        iconSpan.textContent = expanded ? '✕' : 'Ⓜ\uFE0E'
         
         const labelSpan = document.createElement('span')
         labelSpan.className = 'btn-label'
-        labelSpan.textContent = 'More'
+        labelSpan.textContent = 'Menu'
         
         collapseToggleButton.appendChild(iconSpan)
         collapseToggleButton.appendChild(labelSpan)
@@ -740,7 +740,7 @@ menu-bar-walkie-btn`
         hideCollapseButtons()
     }
 
-    // ★★★ 創建 collapse-toggle-btn（參照 FullscreenBtn 的簡潔風格）★★★
+    //  創建 collapse-toggle-btn
     const createCollapseToggleButton = () => {
         if (!isCollapseEnabled()) {
             removeCollapseToggleButton()
