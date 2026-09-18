@@ -1,5 +1,5 @@
 // plugin.js
-exports.version = 2.9
+exports.version = 3.0
 exports.apiRequired = 9.6
 exports.description = "Frontend UI customization plugin - Hide/show buttons, reorder menu bar, add refresh, fullscreen controls, tile size toggle, and collapse toggle."
 exports.repo = "Hug3O/Frontend-toggles"
@@ -7,8 +7,28 @@ exports.frontend_js = "main.js"
 exports.frontend_css = "style.css"
 
 exports.config = {
-    // 按鈕顯示控制
+    // ============================================
+    // === Configuration Group Selector ===
+    // ============================================
+    config_tab: {
+        type: 'select',
+        defaultValue: 'visibility',
+        options: {
+            '1. Button Visibility': 'visibility',
+            '2. Feature Toggles': 'features',
+            '3. Button Order': 'order',
+            '4. Collapse Menu': 'collapse'
+        },
+        label: "Configuration Category",
+        helperText: "Select a category to view and edit settings.",
+        frontend: true
+    },
+
+    // ============================================
+    // === 1. Button Visibility ===
+    // ============================================
     hideHomeBtn: {
+        showIf: x => x.config_tab === 'visibility',
         type: 'boolean',
         label: 'Hide Home Button (breadcrumb 2)',
         defaultValue: false,
@@ -17,6 +37,7 @@ exports.config = {
         helperText: 'Hide the "Home" button, usually the second item in the breadcrumb navigation.'
     },
     hideBackBtn: {
+        showIf: x => x.config_tab === 'visibility',
         type: 'boolean',
         label: 'Hide Back Button (breadcrumb 1)',
         defaultValue: false,
@@ -25,6 +46,7 @@ exports.config = {
         helperText: 'Hide the "Back" button, typically the first item in the breadcrumb navigation.'
     },
     hideZipBtn: {
+        showIf: x => x.config_tab === 'visibility',
         type: 'boolean',
         label: 'Hide Zip Download Button',
         defaultValue: true,
@@ -33,6 +55,7 @@ exports.config = {
         helperText: 'Hide the "Zip" button to prevent users from downloading the entire folder as a ZIP file.'
     },
     hideSelectBtn: {
+        showIf: x => x.config_tab === 'visibility',
         type: 'boolean',
         label: 'Hide Select Button',
         defaultValue: false,
@@ -41,6 +64,7 @@ exports.config = {
         helperText: 'Hide the "Select" button, which is used to mark files for actions like Zip and Delete.'
     },
     hideSearchBtn: {
+        showIf: x => x.config_tab === 'visibility',
         type: 'boolean',
         label: 'Hide Search Button',
         defaultValue: false,
@@ -49,8 +73,11 @@ exports.config = {
         helperText: 'Hide the "Search" button, used for filtering the visible file list.'
     },
 
-    // 功能開關
+    // ============================================
+    // === 2. Feature Toggles ===
+    // ============================================
     enableFullscreenBtn: {
+        showIf: x => x.config_tab === 'features',
         type: 'boolean',
         label: 'Show Fullscreen Button',
         defaultValue: true,
@@ -58,8 +85,8 @@ exports.config = {
         xs: 6,
         helperText: 'Display a fullscreen toggle button (⛶) in the top menu and preview area for fullscreen viewing.'
     },
-
     enablePageRefreshBtn: {
+        showIf: x => x.config_tab === 'features',
         type: 'boolean',
         label: 'Show Page Refresh Button',
         defaultValue: false,
@@ -67,16 +94,16 @@ exports.config = {
         xs: 6,
         helperText: 'Show a page refresh button in the menu bar next to the fullscreen button.'
     },
-
     enableTileSizeBtn: {
+        showIf: x => x.config_tab === 'features',
         type: 'boolean',
         label: 'Show Tile Size Toggle Button',
         defaultValue: true,
         frontend: true,
         helperText: 'Show a tile size toggle button above the breadcrumb area. Click: list ▤ (0) ↔ server default ▦; at tile6, click returns to server default ▦. Double-click: jump to tile6 ▣. Server default is sniffed from backend config.yaml.'
     },
-
     enableRefreshListBtn: {
+        showIf: x => x.config_tab === 'features',
         type: 'boolean',
         label: 'Show Refresh List Button',
         defaultValue: false,
@@ -84,8 +111,8 @@ exports.config = {
         xs: 6,
         helperText: 'Show a refresh list button (↺) in the menu for refreshing the file list without reloading the entire page.'
     },
-
     enableRefreshBtn: {
+        showIf: x => x.config_tab === 'features',
         type: 'boolean',
         label: 'Show Refresh Button',
         defaultValue: false,
@@ -94,8 +121,11 @@ exports.config = {
         helperText: 'Show a small button (▲) above the breadcrumb area to reload the page content.'
     },
 
-    // 按鈕排序配置
+    // ============================================
+    // === 3. Button Order ===
+    // ============================================
     buttonOrderEnabled: {
+        showIf: x => x.config_tab === 'order',
         type: 'boolean',
         label: 'Enable Custom Button Order',
         defaultValue: true,
@@ -103,11 +133,12 @@ exports.config = {
         helperText: 'Enable custom ordering of buttons in the menu bar.'
     },
     buttonOrder: {
+        showIf: x => x.config_tab === 'order' && x.buttonOrderEnabled,
         type: 'string',
         label: 'Button Order (one per line)',
         multiline: true,
         frontend: true,
-        defaultValue: 
+        defaultValue:
 `collapse-toggle-btn
 login-button
 user-button
@@ -125,8 +156,11 @@ menu-bar-music-btn`,
         helperText: 'Enter one button ID or class per line. Buttons will be displayed from top to bottom in this order. Use the exact ID or class name as shown in the HTML.'
     },
 
-    // 收納菜單配置
+    // ============================================
+    // === 4. Collapse Menu ===
+    // ============================================
     enableCollapseMenu: {
+        showIf: x => x.config_tab === 'collapse',
         type: 'boolean',
         label: 'Enable Collapse Toggle Button',
         defaultValue: false,
@@ -134,11 +168,12 @@ menu-bar-music-btn`,
         helperText: 'Enable a toggle button (☰) at the start of menu bar to show/hide specified buttons. (Disabled by default to avoid conflict with hide buttons above)'
     },
     collapseButtons: {
+        showIf: x => x.config_tab === 'collapse' && x.enableCollapseMenu,
         type: 'string',
         label: 'Buttons to Collapse (one per line)',
         multiline: true,
         frontend: true,
-        defaultValue: 
+        defaultValue:
 `login-button
 user-button
 upload-button
