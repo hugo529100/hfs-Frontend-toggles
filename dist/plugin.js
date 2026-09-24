@@ -1,5 +1,5 @@
 // plugin.js
-exports.version = 3.0
+exports.version = 3.1
 exports.apiRequired = 9.6
 exports.description = "Frontend UI customization plugin - Hide/show buttons, reorder menu bar, add refresh, fullscreen controls, tile size toggle, and collapse toggle."
 exports.repo = "Hug3O/Frontend-toggles"
@@ -151,6 +151,7 @@ options-button
 hfs-sync-button
 menu-bar-walkie-btn
 menu-bar-qp-btn
+menu-bar-chat-btn
 menu-bar-notes-btn
 menu-bar-music-btn`,
         helperText: 'Enter one button ID or class per line. Buttons will be displayed from top to bottom in this order. Use the exact ID or class name as shown in the HTML.'
@@ -176,11 +177,8 @@ menu-bar-music-btn`,
         defaultValue:
 `login-button
 user-button
-upload-button
-menu-bar-fullscreen-btn
-hfs-sync-button
-menu-bar-qp-btn
-menu-bar-walkie-btn`,
+options-button
+`,
         helperText: 'Enter one button ID or class per line. These buttons will be hidden/shown when toggling. Note: If a button is hidden by the options above, it will not appear in the collapse menu.'
     }
 }
